@@ -1,59 +1,120 @@
+import tensorflow as tf
 from tensorflow import keras as k
 from tensorflow import layers as ly
 
 
-def residual_block(x, kern, filters):
-    
+nonlinear = {
+    'tanh': tf.tanh,
+    'sigmoid': tf.sigmoid,
+    'linear': tf.identity,
+    'relu': tf.nn.relu,
+    'leaky_relu': k.layers.LeakyReLU(alpha=0.2),
+    'prelu': k.layers.PReLU(),
+    'softmax': tf.nn.softmax,
+}
+
+
+def residual_block_1D(x, kernel_size, activation, batch_norm=True):
+
+    assert len(x.shape) == 3, "Input tensor must be 3-dimensional."
+
+    filters = int(x.shape[2])
+
     y = ly.conv1d(
         inputs=x,
         filters=filters,
-        kernel_size=kern,
+        kernel_size=kernel_size,
         strides=1,
-        padding='same',
-        kernel_initializer=tf.random_normal_initializer(stddev=0.02),
-        activation=tf.identity
+        padding='same'
         )
-    y = k.layers.PReLU()(y)
+
+    if batch_norm:
+        y = ly.batch_normalization(y)
+
+    y = nonlinear[activation](y)
+
     y = ly.conv1d(
         inputs=y,
         filters=filters,
-        kernel_size=kern,
+        kernel_size=kernel_size,
         strides=1,
-        padding='same',
-        kernel_initializer=tf.random_normal_initializer(stddev=0.02),
-        activation=tf.identity
+        padding='same'
         )
-    
+
+    if batch_norm:
+        y = ly.batch_normalization(y)
+
     return tf.add(x, y)
 
 
-def subpixel_convolution(x, block_size):
-    
-    y = ly.conv1d(
+def residual_block_2D(x, kernel_size, activation, batch_norm=True):
+
+    assert len(x.shape) == 4, "Input tensor must be 4-dimensional."
+
+    filters = int(x.shape[3])
+
+    y = ly.conv2d(
+        inputs=x,
+        filters=filters,
+        kernel_size=kernel_size,
+        strides=1,
+        padding='same'
+        )
+
+    if batch_norm:
+        y = ly.batch_normalization(y)
+
+    y = nonlinear[activation](y)
+
+    y = ly.conv2d(
+        inputs=y,
+        filters=filters,
+        kernel_size=kernel_size,
+        strides=1,
+        padding='same'
+        )
+
+    if batch_norm:
+        y = ly.batch_normalization(y)
+
+    return tf.add(x, y)
+
+
+def subpixel_convolution(x, upscale_ratio, activation, kernel_size=3, stride=1):
+
+    assert len(x.shape) == 4, "Input tensor must be 4-dimensional."
+
+    n_filters = int(x.shape[3])
+
+    y = ly.conv2d(
     inputs=x,
-    filters=256,
-    kernel_size=3,
-    strides=1,
-    padding='same',
-    kernel_initializer=tf.random_normal_initializer(stddev=0.02),
-    activation=tf.identity
+    filters=n_filters*upscale_ratio**2,
+    kernel_size=kernel_size,
+    strides=stride,
+    padding='same'
     )
-    y = tf.depth_to_space(y, block_size=block_size)
-    
-    return k.layers.PReLU()(y)
+
+    y = tf.depth_to_space(y, block_size=upscale_ratio)
+
+    y = nonlinear[activation](y)
+
+    return y
 
 
-def convolutional_block(x, filters, stride):
-    
+def convolutional_block(x, kernel_size, filters, stride, activation,
+        batch_norm=True):
+
     y = ly.conv1d(
     inputs=x,
     filters=filters,
-    kernel_size=3,
+    kernel_size=kernel_size,
     strides=stride,
-    padding='same',
-    kernel_initializer=tf.random_normal_initializer(stddev=0.02),
-    activation=tf.identity
+    padding='same'
     )
-    y = ly.batch_normalization(y)
-    
-    return k.layers.LeakyReLU(alpha=0.2)(y)
+
+    y = nonlinear[activation](y)
+
+    if batch_norm:
+        y = ly.batch_normalization(y)
+
+    return y
