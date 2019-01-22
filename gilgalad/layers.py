@@ -14,8 +14,9 @@ nonlinear = {
 }
 
 
-def residual_block_1D(x, kernel_size, activation, batch_norm=True):
+def res_block_1d(x, kernel_size, activation, batch_norm=True):
 
+    activation = activation.lower()
     assert len(x.shape) == 3, "Input tensor must be 3-dimensional."
 
     filters = int(x.shape[2])
@@ -47,8 +48,9 @@ def residual_block_1D(x, kernel_size, activation, batch_norm=True):
     return tf.add(x, y)
 
 
-def residual_block_2D(x, kernel_size, activation, batch_norm=True):
+def res_block_2d(x, kernel_size, activation, batch_norm=True):
 
+    activation = activation.lower()
     assert len(x.shape) == 4, "Input tensor must be 4-dimensional."
 
     filters = int(x.shape[3])
@@ -82,6 +84,7 @@ def residual_block_2D(x, kernel_size, activation, batch_norm=True):
 
 def subpixel_convolution(x, upscale_ratio, activation, kernel_size=3, stride=1):
 
+    activation = activation.lower()
     assert len(x.shape) == 4, "Input tensor must be 4-dimensional."
 
     n_filters = int(x.shape[3])
@@ -101,8 +104,10 @@ def subpixel_convolution(x, upscale_ratio, activation, kernel_size=3, stride=1):
     return y
 
 
-def convolutional_block(x, kernel_size, filters, stride, activation,
+def conv_block_1d(x, kernel_size, filters, stride, activation,
         batch_norm=True):
+
+    activation = activation.lower()
 
     y = ly.conv1d(
     inputs=x,
@@ -116,5 +121,43 @@ def convolutional_block(x, kernel_size, filters, stride, activation,
 
     if batch_norm:
         y = ly.batch_normalization(y)
+
+    return y
+
+
+def conv_block_2d(x, kernel_size, filters, stride, activation,
+        batch_norm=True):
+
+    activation = activation.lower()
+
+    y = ly.conv2d(
+    inputs=x,
+    filters=filters,
+    kernel_size=kernel_size,
+    strides=stride,
+    padding='same'
+    )
+
+    y = nonlinear[activation](y)
+
+    if batch_norm:
+        y = ly.batch_normalization(y)
+
+    return y
+
+
+def conv_2d(x, kernel_size, filters, stride, activation):
+
+    activation = activation.lower()
+
+    y = ly.conv2d(
+    inputs=x,
+    filters=filters,
+    kernel_size=kernel_size,
+    strides=stride,
+    padding='same'
+    )
+
+    y = nonlinear[activation](y)
 
     return y
