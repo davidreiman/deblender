@@ -3,6 +3,7 @@ import os
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
+import tensorflow.contrib.slim as slim
 
 
 class DataSampler:
@@ -152,7 +153,7 @@ def plot_spectrum(spec):
     return fig
 
 
-def get_total_parameters():
+def get_total_params():
     """
     Computes the total number of learnable variables in default graph.
     """
@@ -164,3 +165,11 @@ def get_total_parameters():
             variable_parameters *= dim.value
         total_parameters += variable_parameters
     return total_parameters
+
+
+def get_trainable_params():
+    """
+    Analyzes trainable variables in default graph.
+    """
+    model_vars = tf.trainable_variables()
+    slim.model_analyzer.analyze_vars(model_vars, print_info=True)
