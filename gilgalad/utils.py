@@ -32,8 +32,8 @@ class DataSampler:
             [train_init, valid_init, test_init]))
 
     def make_dataset(self, filepath, train=False):
-        files = [os.path.join(filepath, file) for file in \
-                 os.listdir(filepath) if file.endswith('.tfrecords')]
+        files = [os.path.join(filepath, file) for file
+            in os.listdir(filepath) if file.endswith('.tfrecords')]
         dataset = tf.data.TFRecordDataset(files).map(self.decoder)
 
         if train:
@@ -134,8 +134,8 @@ def restore_session(sess, ckptdir):
     """
     Restores the checkpoint session from disk.
     """
-    meta_graph = [os.path.join(ckptdir, file) for file in \
-                  os.listdir(ckptdir) if file.endswith('.meta')][0]
+    meta_graph = [os.path.join(ckptdir, file) for file
+        in os.listdir(ckptdir) if file.endswith('.meta')][0]
     restorer = tf.train.import_meta_graph(meta_graph)
     restorer.restore(sess, tf.train.latest_checkpoint(ckptdir))
 

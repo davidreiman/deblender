@@ -18,15 +18,18 @@ class ResNet:
             kernel_size=3,
             filters=64,
             stride=1,
-            activation='prelu')
+            activation='prelu'
+        )
 
         x_ = tf.identity(x)
 
         for i in range(self.num_blocks):
+
             x = gg.layers.res_block_2d(
                 x,
                 kernel_size=3,
-                activation='prelu')
+                activation='prelu'
+            )
 
         x = tf.add(x, x_)
 
@@ -34,14 +37,16 @@ class ResNet:
             x = gg.layers.subpixel_conv(
                 x,
                 upscale_ratio=2,
-                activation='prelu')
+                activation='prelu'
+            )
 
         x = gg.layers.conv_2d(
             x,
             kernel_size=3,
             filters=3,
             stride=1,
-            activation='sigmoid')
+            activation='sigmoid'
+        )
 
         return x
 
