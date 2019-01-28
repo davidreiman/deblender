@@ -1,67 +1,23 @@
-import numpy as np
 import gilgalad as gg
-import tensorflow as tf
 
+data_shapes = {
+    'x': (32, 32, 3),
+    'y': (128, 128, 3),
+    'z': (4,)
+}
 
-class ResNet:
-    def __init__(self, num_blocks, name='resnet'):
-        self.name = name
-        self.num_blocks = num_blocks
+sampler = gg.utils.DataSampler(
+    train_path='/vol/data/project/train',
+    valid_path='/vol/data/project/valid',
+    test_path='/vol/data/project/test',
+    data_shapes=data_shapes,
+    batch_size=32
+)
 
-    def __call__(self, x, reuse=False):
-        with tf.variable_scope(self.name) as vs:
-            if reuse:
-                vs.reuse_variables()
+network = gg.models.ResNet()
 
-        x = gg.layers.conv_2d(
-            x,
-            kernel_size=3,
-            filters=64,
-            stride=1,
-            activation='prelu'
-        )
+logdir = '/vol/projects/deblender/logdir'
+ckptdir = '/vol/projects/deblender/ckptdir'
 
-        x_ = tf.identity(x)
-
-        for i in range(self.num_blocks):
-
-            x = gg.layers.res_block_2d(
-                x,
-                kernel_size=3,
-                activation='prelu'
-            )
-
-        x = tf.add(x, x_)
-
-        for j in range(2):
-            x = gg.layers.subpixel_conv(
-                x,
-                upscale_ratio=2,
-                activation='prelu'
-            )
-
-        x = gg.layers.conv_2d(
-            x,
-            kernel_size=3,
-            filters=3,
-            stride=1,
-            activation='sigmoid'
-        )
-
-        return x
-
-    @property
-    def vars(self):
-        return [var for var in tf.global_variables() if self.name in var.name]
-
-
-def build_graph():
-
-    x = tf.placeholder(tf.float32, [None, 32, 32, 3])
-    y = net(x)
-
-    print(y.shape.as_list())
-
-
-net = ResNet(5)
-build_graph()
+graph = gg.graph.Graph(network, sampler, logdir, ckptdir)
+graph.train()
