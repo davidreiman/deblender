@@ -13,19 +13,21 @@ class DataSampler:
     resulting sampler is reinitializable onto any of three datasets
     (training, validation, testing) via the initialize method.
     """
-    def __init__(self, train_path, valid_path, test_path, batch_size,
-            shuffle=True):
+    def __init__(self, train_path, valid_path, test_path, data_shapes,
+        batch_size, shuffle=True, buffer_size=10000):
 
+        self.data_shapes = data_shapes
         self.batch_size = batch_size
         self.shuffle = shuffle
+        self.buffer_size = buffer_size
 
         valid, test = map(self.make_dataset, [valid_path, test_path])
         train = self.make_dataset(train_path, train=True)
 
-        self.iter = tf.data.Iterator.from_structure(train.output_types,
-            train.output_shapes)
-        train_init, valid_init, test_init = map(self.iter.make_initializer,
-            [train, valid, test])
+        self.iter = tf.data.Iterator.from_structure(
+            train.output_types, train.output_shapes)
+        train_init, valid_init, test_init = map(
+            self.iter.make_initializer, [train, valid, test])
         self.init_ops = dict(zip(['train', 'valid', 'test'],
             [train_init, valid_init, test_init]))
 
@@ -36,7 +38,7 @@ class DataSampler:
 
         if train:
             if self.shuffle:
-                dataset = dataset.shuffle(buffer_size=10000)
+                dataset = dataset.shuffle(buffer_size=self.buffer_size)
             return dataset.repeat().batch(self.batch_size)
         else:
             return dataset.batch(self.batch_size)
@@ -48,22 +50,17 @@ class DataSampler:
             raise ValueError('Dataset unknown or unavailable.')
 
     def decoder(self, example_proto):
-        keys_to_features = {'latent' : tf.FixedLenFeature(4000, tf.float32),
-                            'target' : tf.FixedLenFeature(400, tf.float32),
-                            'metadata' : tf.FixedLenFeature(4, tf.float32)}
-        parsed_features = tf.parse_single_example(
-            example_proto,
-            keys_to_features)
-        return (parsed_features['latent'],
-            parsed_features['target'],
-            parsed_features['metadata'])
+        feature_keys = {k: tf.FixedLenFeature(np.prod(v), tf.float32)
+                            for k, v in self.data_shapes.items()}
+        parsed_features = tf.parse_single_example(example_proto, feature_keys)
+        parsed = [parsed_features[key] for key in self.data_shapes.keys()]
+        return parsed
 
     def get_batch(self):
-        x, y, z = self.iter.get_next()
-        x = tf.reshape(x, [-1, 4000, 1])
-        y = tf.reshape(y, [-1, 400, 1])
-        z = tf.reshape(z, [-1, 4])
-        return x, y, z
+        batch = self.iter.get_next()
+        batch = [tf.reshape(batch[i], [-1] + list(v))
+                 for i, v in enumerate(self.data_shapes.values())]
+        return batch
 
 
 def np_to_tfrecords(X, Y, Z, file_path_prefix, verbose=False):
