@@ -96,8 +96,6 @@ def subpixel_conv(x, upscale_ratio, activation, kernel_size=3):
     assert isinstance(upscale_ratio, int), "Upscale ratio must be integer."
     activation = activation.lower()
 
-    print(x.shape)
-
     n_filters = int(x.shape[3])
 
     y = ly.conv2d(
@@ -108,11 +106,7 @@ def subpixel_conv(x, upscale_ratio, activation, kernel_size=3):
         padding='same'
     )
 
-    print(y.shape)
-
     y = tf.depth_to_space(y, block_size=upscale_ratio)
-
-    print(y.shape)
 
     y = nonlinear[activation](y)
 
