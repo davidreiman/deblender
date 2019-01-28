@@ -119,7 +119,7 @@ def subpixel_conv(x, upscale_ratio, activation, kernel_size=3):
     return y
 
 
-def conv_block_1d(x, kernel_size, filters, stride, activation,
+def conv_block_1d(x, kernel_size, filters, strides, activation,
         batch_norm=True):
 
     activation = activation.lower()
@@ -128,7 +128,7 @@ def conv_block_1d(x, kernel_size, filters, stride, activation,
         inputs=x,
         filters=filters,
         kernel_size=kernel_size,
-        strides=stride,
+        strides=strides,
         padding='same'
     )
 
@@ -140,7 +140,7 @@ def conv_block_1d(x, kernel_size, filters, stride, activation,
     return y
 
 
-def conv_block_2d(x, kernel_size, filters, stride, activation,
+def conv_block_2d(x, kernel_size, filters, strides, activation,
         batch_norm=True):
 
     activation = activation.lower()
@@ -149,7 +149,7 @@ def conv_block_2d(x, kernel_size, filters, stride, activation,
         inputs=x,
         filters=filters,
         kernel_size=kernel_size,
-        strides=stride,
+        strides=strides,
         padding='same'
     )
 
@@ -161,7 +161,7 @@ def conv_block_2d(x, kernel_size, filters, stride, activation,
     return y
 
 
-def conv_2d(x, kernel_size, filters, stride, activation):
+def conv_2d(x, kernel_size, filters, strides, activation):
 
     activation = activation.lower()
 
@@ -169,10 +169,32 @@ def conv_2d(x, kernel_size, filters, stride, activation):
         inputs=x,
         filters=filters,
         kernel_size=kernel_size,
-        strides=stride,
+        strides=strides,
         padding='same'
     )
 
     y = nonlinear[activation](y)
 
     return y
+
+
+def dense(x, units, activation):
+
+    activation = activation.lower()
+
+    y = ly.dense(
+        inputs=x,
+        units=units
+    )
+
+    y = nonlinear[activation](y)
+
+    return y
+
+
+def flatten(x):
+    return ly.Flatten()(x)
+
+
+def batch_norm(x):
+    return ly.batch_normalization(x)
