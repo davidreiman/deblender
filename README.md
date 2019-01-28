@@ -4,8 +4,9 @@
 
 ---
 
-Personal deep learning library with frequently used utilities and layer combinations.
-
+<p align="center">
+My personal deep learning library with frequently used utilities and layer combinations.
+</p>
 
 ## Getting Started
 
