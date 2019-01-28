@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/images/deblendergan.png">
+  <img src="docs/images/logo.png">
 </p>
 
 ---
