@@ -3,13 +3,21 @@ from tensorflow import keras as k
 from tensorflow import layers as ly
 
 
+def prelu(x):
+    return k.layers.PReLU()(x)
+
+
+def leaky_relu(x):
+    return k.layers.LeakyReLU()(x)
+
+
 nonlinear = {
     'tanh': tf.tanh,
     'sigmoid': tf.sigmoid,
     'linear': tf.identity,
     'relu': tf.nn.relu,
-    'leaky_relu': k.layers.LeakyReLU(alpha=0.2),
-    'prelu': k.layers.PReLU(),
+    'leaky_relu': leaky_relu,
+    'prelu': prelu,
     'softmax': tf.nn.softmax,
 }
 
