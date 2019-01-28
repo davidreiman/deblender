@@ -37,7 +37,7 @@ class ResNet:
             x = gg.layers.subpixel_conv(
                 x,
                 upscale_ratio=2,
-                activation='prelu'
+                activation='relu'
             )
 
         x = gg.layers.conv_2d(

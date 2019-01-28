@@ -16,8 +16,8 @@ nonlinear = {
 
 def res_block_1d(x, kernel_size, activation, batch_norm=True):
 
-    activation = activation.lower()
     assert len(x.shape) == 3, "Input tensor must be 3-dimensional."
+    activation = activation.lower()
 
     filters = int(x.shape[2])
 
@@ -50,8 +50,8 @@ def res_block_1d(x, kernel_size, activation, batch_norm=True):
 
 def res_block_2d(x, kernel_size, activation, batch_norm=True):
 
-    activation = activation.lower()
     assert len(x.shape) == 4, "Input tensor must be 4-dimensional."
+    activation = activation.lower()
 
     filters = int(x.shape[3])
 
@@ -84,9 +84,11 @@ def res_block_2d(x, kernel_size, activation, batch_norm=True):
 
 def subpixel_conv(x, upscale_ratio, activation, kernel_size=3):
 
-    activation = activation.lower()
     assert len(x.shape) == 4, "Input tensor must be 4-dimensional."
     assert isinstance(upscale_ratio, int), "Upscale ratio must be integer."
+    activation = activation.lower()
+
+    print(x.shape)
 
     n_filters = int(x.shape[3])
 
@@ -98,7 +100,11 @@ def subpixel_conv(x, upscale_ratio, activation, kernel_size=3):
         padding='same'
     )
 
+    print(y.shape)
+
     y = tf.depth_to_space(y, block_size=upscale_ratio)
+
+    print(y.shape)
 
     y = nonlinear[activation](y)
 
