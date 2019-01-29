@@ -5,7 +5,7 @@
 ---
 
 <p align="center">
-My personal deep learning library with frequently used utilities and layer combinations.
+A personal deep learning project template with frequently used utilities and layer combinations.
 </p>
 
 ## Getting Started
