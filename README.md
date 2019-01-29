@@ -20,13 +20,20 @@ Gil-Galad model selection is employed via Sherpa's Bayesian optimization suite w
 With Gil-Galad, we specify which hyperparameters we will optimize by passing a parameter dictionary to our model class while also defining default hyperparameters during model construction as follows:
 
 ```python
-
-y = conv_2d(
-  x=x,
-  filters=params['filt1'] if params else 64,
-  kernel_size=params['kern1'] if params else 3,
-  strides=2,
-  activation='relu'
-)
+class Model:
+  def __init__(self, params=None):
+    self.params=params
+  
+  def __call__(self, x):
+  
+    y = conv_2d(
+      x=x,
+      filters=params['filt1'] if self.params else 64,
+      kernel_size=params['kern1'] if self.params else 3,
+      strides=2,
+      activation='relu'
+    )
+  
+    return y
 
 ```
