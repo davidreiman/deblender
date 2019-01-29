@@ -1,8 +1,6 @@
 import os
-# import tfplot
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
 import tensorflow.contrib.slim as slim
 
 
@@ -51,7 +49,7 @@ class DataSampler:
 
     def decoder(self, example_proto):
         feature_keys = {k: tf.FixedLenFeature(np.prod(v), tf.float32)
-                            for k, v in self.data_shapes.items()}
+            for k, v in self.data_shapes.items()}
         parsed_features = tf.parse_single_example(example_proto, feature_keys)
         parsed = [parsed_features[key] for key in self.data_shapes.keys()]
         return parsed
@@ -59,7 +57,7 @@ class DataSampler:
     def get_batch(self):
         batch = self.iter.get_next()
         batch = [tf.reshape(batch[i], [-1] + list(v))
-                 for i, v in enumerate(self.data_shapes.values())]
+            for i, v in enumerate(self.data_shapes.values())]
         return batch
 
 
@@ -138,16 +136,6 @@ def restore_session(sess, ckptdir):
         in os.listdir(ckptdir) if file.endswith('.meta')][0]
     restorer = tf.train.import_meta_graph(meta_graph)
     restorer.restore(sess, tf.train.latest_checkpoint(ckptdir))
-
-
-def plot_spectrum(spec):
-    """
-    Plots 1-D data and returns matplotlib figure for use with tfplot.
-    """
-    plt.style.use('seaborn')
-    fig, ax = tfplot.subplots(figsize=(4, 3))
-    im = ax.plot(np.arange(1210, 1280, 0.25), spec)
-    return fig
 
 
 def get_total_params():

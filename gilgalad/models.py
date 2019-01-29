@@ -1,7 +1,22 @@
 from .layers import *
 
 
-class ResNet:
+class Model:
+    """
+    Abstract neural network model class.
+    """
+    def __call__(self, x, name):
+        """
+        Forward pass through network.
+
+        Args:
+            x(tf.Tensor): input tensor.
+            name(str): name for variable scope definition.
+        """
+        return NotImplementedError("Abstract class methods should not be called.")
+
+
+class ResNet(Model):
     def __init__(self, num_blocks, name='resnet'):
         self.name = name
         self.num_blocks = num_blocks
