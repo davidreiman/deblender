@@ -22,7 +22,7 @@ With Gil-Galad, we specify which hyperparameters we will optimize by passing a p
 ```python
 class Model:
   def __init__(self, params=None):
-    self.params=params
+    self.params = params
   
   def __call__(self, x):
   
