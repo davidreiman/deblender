@@ -1,3 +1,4 @@
+import tensorflow as tf
 from .layers import *
 
 
@@ -5,13 +6,20 @@ class Model:
     """
     Abstract neural network model class.
     """
-    def __call__(self, x, name):
+    def __call__(self, x, reuse=False):
         """
         Forward pass through network.
 
         Args:
             x(tf.Tensor): input tensor.
             name(str): name for variable scope definition.
+        """
+        return NotImplementedError("Abstract class methods should not be called.")
+
+    @property
+    def vars(self):
+        """
+        Getter function for model variables.
         """
         return NotImplementedError("Abstract class methods should not be called.")
 
