@@ -22,10 +22,16 @@ class BaseGraph:
         """
         raise NotImplementedError('Abstract class methods should not be called.')
 
+    def save(self):
+        """
+        Saves model to file.
+        """
+        raise NotImplementedError('Abstract class methods should not be called.')
+
 
 class Graph(BaseGraph):
 
-    def __init__(self, network, sampler, logdir, ckptdir):
+    def __init__(self, network, sampler, logdir=None, ckptdir=None):
         """
         Builds graph and defines loss functions & optimizers.
 
@@ -53,9 +59,9 @@ class Graph(BaseGraph):
         with tf.control_dependencies(update_ops):
             self.opt = tf.train.AdamOptimizer().minimize(self.loss)
 
-        if not os.path.isdir(logdir):
+        if self.logdir and not os.path.isdir(logdir):
             os.makedirs(logdir)
-        if not os.path.isdir(ckptdir):
+        if self.ckptdir and not os.path.isdir(ckptdir):
             os.makedirs(ckptdir)
 
         self.global_step = tf.Variable(1, trainable=False)
@@ -63,7 +69,8 @@ class Graph(BaseGraph):
         loss_summary = tf.summary.scalar("Loss", self.loss)
         self.merged_summary = tf.summary.merge_all()
 
-        self.summary_writer = tf.summary.FileWriter(logdir)
+        if self.logdir:
+            self.summary_writer = tf.summary.FileWriter(logdir)
         self.saver = tf.train.Saver(max_to_keep=3)
 
         gpu_options = tf.GPUOptions(allow_growth=True)
@@ -72,35 +79,39 @@ class Graph(BaseGraph):
         self.sess = tf.Session(config=self.config)
         self.sess.run(tf.global_variables_initializer())
 
+    def save(self):
+        if self.ckptdir:
+            self.saver.save(
+                sess=self.sess,
+                save_path=os.path.join(self.ckptdir, 'ckpt'),
+                global_step=self.global_step
+            )
+
+    def add_summary(self):
+        if self.logdir:
+            summaries = self.sess.run(self.merged_summary)
+            self.summary_writer.add_summary(
+                summary=summaries,
+                global_step=self.global_step
+            )
+
     def train(self, n_batches, summary_interval=100, ckpt_interval=10000):
 
         self.sess.run(self.data.initialize('train'))
 
         try:
             for batch in pbar(range(n_batches), unit='batch'):
-                sess.run(self.opt)
+                self.sess.run(self.opt)
 
                 if batch % summary_interval == 0:
-                    summaries = sess.run(self.merged_summary)
-                    self.summary_writer.add_summary(
-                        summary=summaries,
-                        global_step=self.global_step
-                    )
+                    self.add_summary()
 
                 if batch % ckpt_interval == 0 or batch + 1 == n_batches:
-                    self.saver.save(
-                        sess=self.sess,
-                        save_path=os.path.join(self.ckptdir, 'ckpt'),
-                        global_step=self.global_step
-                    )
+                    self.save()
 
         except KeyboardInterrupt:
             print("Saving model before quitting...")
-            self.saver.save(
-                sess=self.sess,
-                save_path=os.path.join(self.ckptdir, 'ckpt'),
-                global_step=self.global_step
-            )
+            self.save()
             print("Save complete. Training stopped.")
 
     def evaluate(self):
