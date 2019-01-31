@@ -42,6 +42,7 @@ def bayesian_optimization(Graph, params, max_trials, iter_per_trial=10,
         if k.lower() not in param_class.keys():
             raise ValueError("Parameter type not recognized: {}".format(k))
         for key, value in v.items():
+            assert isinstance(value, list), "Parameter range must be a list."
             parameters.append(
                 param_class.get(k.lower())(key, value)
             )
