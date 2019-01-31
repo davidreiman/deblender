@@ -39,6 +39,8 @@ def bayesian_optimization(Graph, params, max_trials, iter_per_trial=10,
 
     parameters = []
     for k, v in params.items():
+        if k.lower() not in param_class.keys():
+            raise ValueError("Parameter type not recognized: {}".format(k))
         for key, value in v.items():
             parameters.append(
                 param_class.get(k.lower())(key, value)
