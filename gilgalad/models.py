@@ -28,6 +28,7 @@ class ResNet(Model):
     def __init__(self, num_blocks, name='resnet'):
         self.name = name
         self.num_blocks = num_blocks
+        self.training = True
 
     def __call__(self, x, reuse=False):
         with tf.variable_scope(self.name) as vs:
@@ -49,7 +50,8 @@ class ResNet(Model):
             x = res_block_2d(
                 x,
                 kernel_size=3,
-                activation='prelu'
+                activation='prelu',
+                training=self.training
             )
 
         x = tf.add(x, x_)

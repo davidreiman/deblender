@@ -42,14 +42,14 @@ class Graph(BaseGraph):
             ckptdir(str): filepath location for saving model.
         """
 
-        self.n = network
+        self.network = network
         self.data = sampler
         self.logdir = logdir
         self.ckptdir = ckptdir
 
         self.x, self.y, self.z = self.data.get_batch()
 
-        self.y_ = self.n(self.x)
+        self.y_ = self.network(self.x)
 
         self.loss = tf.losses.mean_squared_error(self.y, self.y_)
         self.eval_metric = tf.metrics.mean_absolute_error(self.y, self.y_)
@@ -57,7 +57,11 @@ class Graph(BaseGraph):
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
 
         with tf.control_dependencies(update_ops):
-            self.opt = tf.train.AdamOptimizer().minimize(self.loss)
+            self.opt = tf.train.AdamOptimizer().minimize(
+                loss=self.loss,
+                var_list=self.network.vars,
+                global_step=self.global_step
+            )
 
         if self.logdir and not os.path.isdir(logdir):
             os.makedirs(logdir)
@@ -96,7 +100,7 @@ class Graph(BaseGraph):
             )
 
     def train(self, n_batches, summary_interval=100, ckpt_interval=10000):
-
+        self.network.training = True
         self.sess.run(self.data.initialize('train'))
 
         try:
@@ -115,6 +119,7 @@ class Graph(BaseGraph):
             print("Save complete. Training stopped.")
 
     def evaluate(self):
+        self.network.training = False
         self.sess.run(self.data.initialize('valid'))
 
         scores = []
@@ -130,4 +135,6 @@ class Graph(BaseGraph):
         return mean_score
 
     def infer(self):
+        self.network.training = False
+        self.sess.run(self.data.initialize('test'))
         pass

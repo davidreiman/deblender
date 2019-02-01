@@ -22,7 +22,7 @@ nonlinear = {
 }
 
 
-def res_block_1d(x, kernel_size, activation, batch_norm=True):
+def res_block_1d(x, kernel_size, activation, training, batch_norm=True):
 
     assert len(x.shape) == 3, "Input tensor must be 3-dimensional."
     activation = activation.lower()
@@ -38,7 +38,7 @@ def res_block_1d(x, kernel_size, activation, batch_norm=True):
     )
 
     if batch_norm:
-        y = ly.batch_normalization(y)
+        y = ly.batch_normalization(y, training=training)
 
     y = nonlinear[activation](y)
 
@@ -51,12 +51,12 @@ def res_block_1d(x, kernel_size, activation, batch_norm=True):
     )
 
     if batch_norm:
-        y = ly.batch_normalization(y)
+        y = ly.batch_normalization(y, training=training)
 
     return tf.add(x, y)
 
 
-def res_block_2d(x, kernel_size, activation, batch_norm=True):
+def res_block_2d(x, kernel_size, activation, training, batch_norm=True):
 
     assert len(x.shape) == 4, "Input tensor must be 4-dimensional."
     activation = activation.lower()
@@ -72,7 +72,7 @@ def res_block_2d(x, kernel_size, activation, batch_norm=True):
     )
 
     if batch_norm:
-        y = ly.batch_normalization(y)
+        y = ly.batch_normalization(y, training=training)
 
     y = nonlinear[activation](y)
 
@@ -85,7 +85,7 @@ def res_block_2d(x, kernel_size, activation, batch_norm=True):
     )
 
     if batch_norm:
-        y = ly.batch_normalization(y)
+        y = ly.batch_normalization(y, training=training)
 
     return tf.add(x, y)
 
@@ -114,7 +114,7 @@ def subpixel_conv(x, upscale_ratio, activation, kernel_size=3):
 
 
 def conv_block_1d(x, kernel_size, filters, strides, activation,
-        batch_norm=True):
+        training, batch_norm=True):
 
     activation = activation.lower()
 
@@ -129,13 +129,13 @@ def conv_block_1d(x, kernel_size, filters, strides, activation,
     y = nonlinear[activation](y)
 
     if batch_norm:
-        y = ly.batch_normalization(y)
+        y = ly.batch_normalization(y, training=training)
 
     return y
 
 
 def conv_block_2d(x, kernel_size, filters, strides, activation,
-        batch_norm=True):
+        training, batch_norm=True):
 
     activation = activation.lower()
 
@@ -150,7 +150,7 @@ def conv_block_2d(x, kernel_size, filters, strides, activation,
     y = nonlinear[activation](y)
 
     if batch_norm:
-        y = ly.batch_normalization(y)
+        y = ly.batch_normalization(y, training=training)
 
     return y
 
@@ -190,5 +190,5 @@ def flatten(x):
     return ly.Flatten()(x)
 
 
-def batch_norm(x):
-    return ly.batch_normalization(x)
+def batch_norm(x, training):
+    return ly.batch_normalization(x, training=training)
