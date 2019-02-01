@@ -54,8 +54,9 @@ class Graph(BaseGraph):
         self.loss = tf.losses.mean_squared_error(self.y, self.y_)
         self.eval_metric = tf.metrics.mean_absolute_error(self.y, self.y_)
 
-        update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        self.global_step = tf.Variable(1, trainable=False)
 
+        update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(update_ops):
             self.opt = tf.train.AdamOptimizer().minimize(
                 loss=self.loss,
@@ -67,8 +68,6 @@ class Graph(BaseGraph):
             os.makedirs(logdir)
         if self.ckptdir and not os.path.isdir(ckptdir):
             os.makedirs(ckptdir)
-
-        self.global_step = tf.Variable(1, trainable=False)
 
         loss_summary = tf.summary.scalar("Loss", self.loss)
         self.merged_summary = tf.summary.merge_all()
