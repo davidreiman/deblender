@@ -28,6 +28,12 @@ class BaseGraph:
         """
         raise NotImplementedError('Abstract class methods should not be called.')
 
+    def summarize(self):
+        """
+        Pushes summaries to TensorBoard via log file.
+        """
+        raise NotImplementedError('Abstract class methods should not be called.')
+
 
 class Graph(BaseGraph):
 
@@ -90,7 +96,7 @@ class Graph(BaseGraph):
                 global_step=self.global_step
             )
 
-    def add_summary(self):
+    def summarize(self):
         if self.logdir:
             summaries = self.sess.run(self.merged_summary)
             self.summary_writer.add_summary(
@@ -107,7 +113,7 @@ class Graph(BaseGraph):
                 self.sess.run(self.opt)
 
                 if batch % summary_interval == 0:
-                    self.add_summary()
+                    self.summarize()
 
                 if batch % ckpt_interval == 0 or batch + 1 == n_batches:
                     self.save()
