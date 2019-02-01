@@ -10,9 +10,23 @@ class DataSampler:
     .tfrecord TensorFlow binaries and passes tensors to graph. The
     resulting sampler is reinitializable onto any of three datasets
     (training, validation, testing) via the initialize method.
+
+    Args:
+        train_path(str): training data filepath containing .tfrecords files.
+        train_path(str): validation data filepath containing .tfrecords files.
+        train_path(str): test data filepath containing .tfrecords files.
+        data_shapes(dict): data shape dictionary to specify reshaping operation.
+        batch_size(int): number of samples per batch call.
+        shuffle(bool): shuffle data (only applicable to training set).
+        buffer_size(int): size of shuffled buffer TFDataset will draw from.
+
+    Note: this class currently only supports float data. In the future, it will
+    need to accomodate integer-valued data as well.
     """
     def __init__(self, train_path, valid_path, test_path, data_shapes,
         batch_size, shuffle=True, buffer_size=10000):
+        assert isinstance(batch_size, int), "Batch size must be integer-valued."
+        assert isinstance(buffer_size, int), "Buffer size must be integer-valued."
 
         self.data_shapes = data_shapes
         self.batch_size = batch_size
@@ -61,14 +75,22 @@ class DataSampler:
         return batch
 
 
-def np_to_tfrecords(X, Y, Z, file_path_prefix, verbose=False):
+def np_to_tfrecords(data, file_path_prefix, verbose=False):
     """
     Converts 2-D NumPy arrays to TensorFlow binaries.
 
-    Author: Sangwoong Yoon
+    Args:
+        data(dict): dictionary of NumPy arrays and corresponding keys.
+        file_path_prefix(str): file path for storing resulting .tfrecords.
+        verbose(bool): function verbosity for debugging.
+
+    Note that the keys provided to create .tfrecord files must correspond with
+    the keys passed to the utils.DataSampler class in the data_shapes arg.
+
+    Adapted from a Gist by Sangwoong Yoon.
     """
     def _dtype_feature(ndarray):
-        """Match appropriate tf.train.Feature class with dtype of ndarray."""
+        """ Match appropriate tf.train.Feature class with dtype of ndarray. """
         assert isinstance(ndarray, np.ndarray)
         dtype_ = ndarray.dtype
         if dtype_ == np.float64 or dtype_ == np.float32:
@@ -78,46 +100,33 @@ def np_to_tfrecords(X, Y, Z, file_path_prefix, verbose=False):
             return lambda array: tf.train.Feature(
                 int64_list=tf.train.Int64List(value=array))
         else:
-            raise ValueError("The input should be numpy ndarray. \
+            raise TypeError("The input should be numpy ndarray. \
                                Instead got {}".format(ndarray.dtype))
 
-    assert isinstance(X, np.ndarray)
-    assert len(X.shape) == 2
+    feature_types, records = {}, []
+    for k, v in data.items():
+        assert isinstance(v, np.ndarray)
+        n_records = v.shape[0]
+        records.append(n_records)
+        if not len(v.shape) == 2:
+            data[k] = v = v.reshape([n_records, -1])
+        feature_types[k] = _dtype_feature(v)
 
-    assert isinstance(Y, np.ndarray) or Y is None
-
-    """ Load appropriate tf.train.Feature class depending on dtype. """
-    dtype_feature_x = _dtype_feature(X)
-    if Y is not None:
-        assert X.shape[0] == Y.shape[0]
-        assert len(Y.shape) == 2
-        dtype_feature_y = _dtype_feature(Y)
-    if Z is not None:
-        assert X.shape[0] == Z.shape[0]
-        assert len(Z.shape) == 2
-        dtype_feature_z = _dtype_feature(Z)
+    assert all(x == records[0] for x in records), \
+        "All data must have the same number of samples."
 
     """ Generate TFRecord writer. """
     result_tf_file = file_path_prefix + '.tfrecords'
     writer = tf.python_io.TFRecordWriter(result_tf_file)
     if verbose:
         print("Serializing {:d} examples into {}".format(
-            X.shape[0], result_tf_file))
+            n_records, result_tf_file))
 
     """ Iterate over each sample and serialize it as ProtoBuf. """
-    for idx in range(X.shape[0]):
-        x = X[idx]
-        if Y is not None:
-            y = Y[idx]
-        if Z is not None:
-            z = Z[idx]
-
+    for idx in range(n_records):
         d_feature = {}
-        d_feature['latent'] = dtype_feature_x(x)
-        if Y is not None:
-            d_feature['target'] = dtype_feature_y(y)
-        if Z is not None:
-            d_feature['metadata'] = dtype_feature_z(z)
+        for k, v in data.items():
+            d_feature[k] = feature_types[k](v[idx])
 
         features = tf.train.Features(feature=d_feature)
         example = tf.train.Example(features=features)
