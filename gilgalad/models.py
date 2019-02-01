@@ -14,14 +14,14 @@ class Model:
             x(tf.Tensor): input tensor.
             name(str): name for variable scope definition.
         """
-        return NotImplementedError("Abstract class methods should not be called.")
+        raise NotImplementedError("Abstract class methods should not be called.")
 
     @property
     def vars(self):
         """
         Getter function for model variables.
         """
-        return NotImplementedError("Abstract class methods should not be called.")
+        raise NotImplementedError("Abstract class methods should not be called.")
 
 
 class ResNet(Model):
