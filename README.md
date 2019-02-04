@@ -71,9 +71,30 @@ class Model:
       filters=params['filters'] if params else 64,
       kernel_size=params['kernel_size'] if params else 3,
       strides=2,
-      activation='relu'
+      activation=params['activation'] if params else 'relu'
     )
   
     return y
 
 ```
+
+We then define the hyperparameter domain type and ranges in a dictionary. This information accompanies the graph object as arguments for the Bayesian optimization function.
+
+```python
+hyperparameters = {
+    'Discrete':
+        {'filters': [64, 128],
+         'kernel_size': [3, 5]},
+    'Continuous':
+        {'lr': [1e-5, 1e-3]},
+    'Choice':
+        {'activation': ['relu', 'prelu']}
+}
+
+best_model = gg.opt.bayesian_optimization(
+    graph=graph,
+    params=hyperparameters,
+    max_trials=50
+)
+```
+
