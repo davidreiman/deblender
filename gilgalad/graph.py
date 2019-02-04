@@ -7,6 +7,15 @@ class BaseGraph:
 
     """ Abstract Graph class to train and evaluate models. """
 
+    def build_graph(self, params=None):
+        """
+        Builds the graph with hyperparameters specified by params dictionary.
+
+        Args:
+            n_batches(int): number of batchwise update iterations.
+        """
+        raise NotImplementedError('Abstract class methods should not be called.')
+
     def train(self, n_batches, summary_interval, ckpt_interval):
         """
         Trains the model for n_batches update iterations.
@@ -53,9 +62,15 @@ class Graph(BaseGraph):
         self.logdir = logdir
         self.ckptdir = ckptdir
 
+        self.build_graph()
+
+    def build_graph(self, params=None):
+
+        tf.reset_default_graph()
+
         self.x, self.y, self.z = self.data.get_batch()
 
-        self.y_ = self.network(self.x)
+        self.y_ = self.network(self.x, params=params)
 
         self.loss = tf.losses.mean_squared_error(self.y, self.y_)
         self.eval_metric = tf.metrics.mean_absolute_error(self.y, self.y_)
@@ -64,7 +79,11 @@ class Graph(BaseGraph):
 
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(update_ops):
-            self.opt = tf.train.AdamOptimizer().minimize(
+            opt = tf.train.AdamOptimizer(
+                learning_rate=params['lr'] if params else 0.001
+            )
+
+            self.update = opt.minimize(
                 loss=self.loss,
                 var_list=self.network.vars,
                 global_step=self.global_step
@@ -110,7 +129,7 @@ class Graph(BaseGraph):
 
         try:
             for batch in pbar(range(n_batches), unit='batch'):
-                self.sess.run(self.opt)
+                self.sess.run(self.update)
 
                 if batch % summary_interval == 0:
                     self.summarize()

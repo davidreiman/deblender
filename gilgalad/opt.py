@@ -2,13 +2,13 @@ import os
 import sherpa
 import numpy as np
 
-def bayesian_optimization(Graph, params, max_trials, iter_per_trial=10,
+def bayesian_optimization(graph, params, max_trials, iter_per_trial=10,
     batches_per_iter=1000, dashboard=False):
     """
     Model selection via Bayesian optimization.
 
     Args:
-        Graph(graph.Graph): uninstantiated graph class.
+        graph(graph.Graph): an instance of the graph class.
         params(dict): dictionary specifying hyperparameters to optimize.
         max_trials(int): maximum number of Bayesian optimization trials.
         iter_per_trial(int): number of observations to add per trial.
@@ -43,9 +43,7 @@ def bayesian_optimization(Graph, params, max_trials, iter_per_trial=10,
             raise ValueError("Parameter type not recognized: {}".format(k))
         for key, value in v.items():
             assert isinstance(value, list), "Parameter range must be a list."
-            parameters.append(
-                param_class.get(k.lower())(key, value)
-            )
+            parameters.append(param_class.get(k.lower())(key, value))
 
     alg = sherpa.algorithms.BayesianOptimization(max_num_trials=max_trials)
 
@@ -57,7 +55,7 @@ def bayesian_optimization(Graph, params, max_trials, iter_per_trial=10,
     )
 
     for trial in study:
-        graph = Graph(params)
+        graph.build_graph(params=trial.parameters)
         for iteration in range(iter_per_trial):
             training_error = graph.train(n_batches=batches_per_iter)
             validation_error = graph.evaluate()

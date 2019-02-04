@@ -21,14 +21,12 @@ ckptdir = '/vol/projects/deblender/ckptdir'
 
 hyperparameters = {
     'Discrete':
-        {'num_units': [50, 200],
-         'kernel_size': [3, 11]},
+        {'filters': [64, 128],
+         'kernel_size': [3, 5]},
     'Continuous':
         {'lr': [1e-5, 1e-3]},
     'Choice':
-        {'activation': ['relu', 'prelu']},
-    'Ordinal':
-        {'batch_size': [16, 32, 64]},
+        {'activation': ['relu', 'prelu']}
 }
 
 graph = gg.graph.Graph(network, sampler, logdir, ckptdir)

@@ -6,7 +6,7 @@ class Model:
     """
     Abstract neural network model class.
     """
-    def __call__(self, x, reuse=False):
+    def __call__(self, x, params, reuse=False):
         """
         Forward pass through network.
 
@@ -25,22 +25,22 @@ class Model:
 
 
 class ResNet(Model):
-    def __init__(self, num_blocks, name='resnet'):
+    def __init__(self, num_blocks=3, name='resnet'):
         self.name = name
         self.num_blocks = num_blocks
         self.training = True
 
-    def __call__(self, x, reuse=False):
+    def __call__(self, x, params, reuse=False):
         with tf.variable_scope(self.name) as vs:
             if reuse:
                 vs.reuse_variables()
 
         x = conv_2d(
             x,
-            kernel_size=3,
-            filters=64,
+            kernel_size=params['kernel_size'] if params else 3,
+            filters=params['filters'] if params else 32,
             stride=1,
-            activation='prelu'
+            activation=params['activation'] if params else 'prelu',
         )
 
         x_ = tf.identity(x)
