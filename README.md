@@ -38,7 +38,9 @@ class Graph(BaseGraph):
         tf.reset_default_graph()
 
         self.x, self.y, self.z = self.data.get_batch()
+        
         self.y_ = self.network(self.x, params=params)
+        
         self.loss = tf.losses.mean_squared_error(self.y, self.y_)
 
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
