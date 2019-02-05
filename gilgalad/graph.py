@@ -69,8 +69,6 @@ class Graph(BaseGraph):
 
     def build_graph(self, params=None):
 
-        # tf.reset_default_graph()
-
         self.x, self.y = self.data.get_batch()
 
         self.y_ = self.network(self.x, params=params)
@@ -102,8 +100,6 @@ class Graph(BaseGraph):
         image_summary = tf.summary.image("Output", self.y_)
         self.merged_summary = tf.summary.merge_all()
 
-        if self.logdir:
-            self.summary_writer = tf.summary.FileWriter(self.logdir)
         self.saver = tf.train.Saver(max_to_keep=3)
 
         gpu_options = tf.GPUOptions(allow_growth=True)
@@ -111,6 +107,12 @@ class Graph(BaseGraph):
 
         self.sess = tf.Session(config=self.config)
         self.sess.run(tf.global_variables_initializer())
+
+        if self.logdir:
+            self.summary_writer = tf.summary.FileWriter(
+                logdir=self.logdir,
+                graph=self.sess.graph
+            )
 
     def save(self):
         if self.ckptdir:
