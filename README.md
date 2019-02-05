@@ -95,6 +95,8 @@ class Model:
 We then define the hyperparameter domain type and ranges in a dictionary. This information accompanies the graph object as arguments for the Bayesian optimization function.
 
 ```python
+import gilgalad as gg
+
 hyperparameters = {
     'Discrete':
         {'filters': [64, 128],
