@@ -1,6 +1,9 @@
+import os
 import numpy as np
 import tensorflow as tf
 from tqdm import tqdm as pbar
+
+from .utils import *
 
 
 class BaseGraph:
@@ -66,18 +69,19 @@ class Graph(BaseGraph):
 
     def build_graph(self, params=None):
 
-        tf.reset_default_graph()
+        # tf.reset_default_graph()
 
-        self.x, self.y, self.z = self.data.get_batch()
+        self.x, self.y = self.data.get_batch()
 
         self.y_ = self.network(self.x, params=params)
 
         self.loss = tf.losses.mean_squared_error(self.y, self.y_)
         self.eval_metric = tf.metrics.mean_absolute_error(self.y, self.y_)
 
-        self.global_step = tf.Variable(1, trainable=False)
+        self.global_step = tf.Variable(0, name='global_step', trainable=False)
 
         update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+
         with tf.control_dependencies(update_ops):
             opt = tf.train.AdamOptimizer(
                 learning_rate=params['lr'] if params else 0.001
@@ -89,16 +93,17 @@ class Graph(BaseGraph):
                 global_step=self.global_step
             )
 
-        if self.logdir and not os.path.isdir(logdir):
-            os.makedirs(logdir)
-        if self.ckptdir and not os.path.isdir(ckptdir):
-            os.makedirs(ckptdir)
+        if self.logdir and not os.path.isdir(self.logdir):
+            os.makedirs(self.logdir)
+        if self.ckptdir and not os.path.isdir(self.ckptdir):
+            os.makedirs(self.ckptdir)
 
         loss_summary = tf.summary.scalar("Loss", self.loss)
+        image_summary = tf.summary.image("Output", self.y_)
         self.merged_summary = tf.summary.merge_all()
 
         if self.logdir:
-            self.summary_writer = tf.summary.FileWriter(logdir)
+            self.summary_writer = tf.summary.FileWriter(self.logdir)
         self.saver = tf.train.Saver(max_to_keep=3)
 
         gpu_options = tf.GPUOptions(allow_growth=True)
@@ -118,9 +123,10 @@ class Graph(BaseGraph):
     def summarize(self):
         if self.logdir:
             summaries = self.sess.run(self.merged_summary)
+            global_step = self.sess.run(self.global_step)
             self.summary_writer.add_summary(
                 summary=summaries,
-                global_step=self.global_step
+                global_step=global_step
             )
 
     def train(self, n_batches, summary_interval=100, ckpt_interval=10000):

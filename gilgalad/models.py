@@ -35,43 +35,43 @@ class ResNet(Model):
             if reuse:
                 vs.reuse_variables()
 
-        x = conv_2d(
-            x,
-            kernel_size=params['kernel_size'] if params else 3,
-            filters=params['filters'] if params else 32,
-            stride=1,
-            activation=params['activation'] if params else 'prelu',
-        )
+            x = conv_2d(
+                x,
+                kernel_size=params['kernel_size'] if params else 3,
+                filters=params['filters'] if params else 32,
+                strides=1,
+                activation=params['activation'] if params else 'prelu',
+            )
 
-        x_ = tf.identity(x)
+            x_ = tf.identity(x)
 
-        for i in range(self.num_blocks):
+            for i in range(self.num_blocks):
 
-            x = res_block_2d(
+                x = res_block_2d(
+                    x,
+                    kernel_size=3,
+                    activation='prelu',
+                    training=self.training
+                )
+
+            x = tf.add(x, x_)
+
+            for j in range(2):
+                x = subpixel_conv(
+                    x,
+                    upscale_ratio=2,
+                    activation='prelu'
+                )
+
+            x = conv_2d(
                 x,
                 kernel_size=3,
-                activation='prelu',
-                training=self.training
+                filters=3,
+                strides=1,
+                activation='sigmoid'
             )
 
-        x = tf.add(x, x_)
-
-        for j in range(2):
-            x = subpixel_conv(
-                x,
-                upscale_ratio=2,
-                activation='prelu'
-            )
-
-        x = conv_2d(
-            x,
-            kernel_size=3,
-            filters=3,
-            stride=1,
-            activation='sigmoid'
-        )
-
-        return x
+            return x
 
     @property
     def vars(self):

@@ -1,5 +1,6 @@
 import gilgalad as gg
 
+
 data_shapes = {
     'x': (32, 32, 3),
     'y': (128, 128, 3),
@@ -15,8 +16,17 @@ sampler = gg.utils.DataSampler(
 
 network = gg.models.ResNet()
 
-logdir = '/vol/projects/deblender/logdir'
-ckptdir = '/vol/projects/deblender/ckptdir'
+logdir = '/Users/David/Documents/project/logdir'
+ckptdir = '/Users/David/Documents/project/ckptdir'
+
+graph = gg.graph.Graph(
+    network=network,
+    sampler=sampler,
+    logdir=logdir,
+    ckptdir=ckptdir
+)
+
+graph.train(n_batches=10)
 
 hyperparameters = {
     'Discrete':
@@ -27,6 +37,3 @@ hyperparameters = {
     'Choice':
         {'activation': ['relu', 'prelu']}
 }
-
-graph = gg.graph.Graph(network, sampler, logdir, ckptdir)
-graph.train()
