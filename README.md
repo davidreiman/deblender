@@ -81,16 +81,16 @@ class Model:
     self.name = name
   
   def __call__(self, x, params):
-  
-    y = conv_2d(
-      x=x,
-      filters=params['filters'] if params else 64,
-      kernel_size=params['kernel_size'] if params else 3,
-      strides=2,
-      activation=params['activation'] if params else 'relu'
-    )
-  
-    return y
+    with tf.variable_scope(self.name) as vs:
+      y = conv_2d(
+        x=x,
+        filters=params['filters'] if params else 64,
+        kernel_size=params['kernel_size'] if params else 3,
+        strides=2,
+        activation=params['activation'] if params else 'relu'
+      )
+
+      return y
 
 ```
 
