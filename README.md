@@ -19,9 +19,11 @@ Clone the repository, navigate to the local directory and begin building your mo
 - [ ] Connect models, define loss, evaluation metrics, etc. in graph.py
     - **Note:** hyperparameters that will be optimized later need to be specified. See **Model Selection** section below.
 - [ ] Specify input data shapes in data_shapes dictionary
-    - **Note:** the order in data_shapes should correspond to the order you retrieve the tensors in the graph
+    - **Note:** Data shapes should not include batch size—this information is passed to the sampler instead
+    - **Additional note:** the order in data_shapes should correspond to the order you retrieve the tensors in the graph
     - In **main.py:** ```data_shapes = {'lowres': (32, 32, 3), 'highres': (128, 128, 3)}```
     - In **graph.py:** ```lowres, highres = data.get_batch()```
+- [ ] Create a DataSampler object with the filepaths to your train/valid/test sets and the data shapes dictionary.
 - [ ] Add custom plotting functionality in plotting.py
 - [ ] Define hyperparameters to optimize over and their corresponding domain ranges in dictionary
 - [ ] Pass your graph object and parameter dictionary to Sherpa via ```gilgalad.opt.bayesian_optimization```
