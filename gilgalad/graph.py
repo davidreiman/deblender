@@ -56,8 +56,8 @@ class Graph(BaseGraph):
         Args:
             network(models.Model): neural network model.
             sampler(utils.DataSampler): data sampler object.
-            logdir(str): filepath location for TensorBoard logging.
-            ckptdir(str): filepath location for saving model.
+            logdir(str): filepath for TensorBoard logging.
+            ckptdir(str): filepath for saving model.
         """
 
         self.network = network
