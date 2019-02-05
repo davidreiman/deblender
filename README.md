@@ -12,6 +12,22 @@ A personal deep learning project template with frequently used utilities and lay
 
 Clone the repository, navigate to the local directory and begin building your models in the models.py module. Data should be divided into training, validation and testing sets and placed in .tfrecords file format in separate directories. Data shapes are specified by a dictionary which is subsequently passed to the data sampler during model creation. Note that the data shape dictionary keys must correspond to the same keys used in converting NumPy arrays to .tfrecords files during preprocessing. The data shape values should be tuples sans batch size.
 
+### Quick Start Checklist
+
+- [ ] Build neural network models in models.py
+    - **Note:** hyperparameters that will be optimized later need to be specified. See **Model Selection** section below.
+- [ ] Connect models, define loss, evaluation metrics, etc. in graph.py
+    - **Note:** hyperparameters that will be optimized later need to be specified. See **Model Selection** section below.
+- [ ] Specify input data shapes in data_shapes dictionary
+    - **Note:** Data shapes should not include batch size—this information is passed to the sampler instead
+    - **Additional note:** the order in data_shapes should correspond to the order you retrieve the tensors in the graph
+      - In **main.py:** ```data_shapes = {'lowres': (32, 32, 3), 'highres': (128, 128, 3)}```
+      - In **graph.py:** ```lowres, highres = data.get_batch()```
+- [ ] Create a DataSampler object with the filepaths to your train/valid/test sets and the data shapes dictionary.
+- [ ] Define hyperparameters to optimize over and their corresponding domain ranges in dictionary
+- [ ] Pass your graph object and hyperparameter dictionary to Sherpa via ```gilgalad.opt.bayesian_optimization```
+- [ ] (Optional) Add custom plotting functionality in plotting.py
+
 
 ## Model Selection
 
@@ -65,22 +81,24 @@ class Model:
     self.name = name
   
   def __call__(self, x, params):
-  
-    y = conv_2d(
-      x=x,
-      filters=params['filters'] if params else 64,
-      kernel_size=params['kernel_size'] if params else 3,
-      strides=2,
-      activation=params['activation'] if params else 'relu'
-    )
-  
-    return y
+    with tf.variable_scope(self.name) as vs:
+      y = conv_2d(
+        x=x,
+        filters=params['filters'] if params else 64,
+        kernel_size=params['kernel_size'] if params else 3,
+        strides=2,
+        activation=params['activation'] if params else 'relu'
+      )
+
+      return y
 
 ```
 
 We then define the hyperparameter domain type and ranges in a dictionary. This information accompanies the graph object as arguments for the Bayesian optimization function.
 
 ```python
+import gilgalad as gg
+
 hyperparameters = {
     'Discrete':
         {'filters': [64, 128],
