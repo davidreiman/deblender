@@ -25,7 +25,7 @@ Clone the repository, navigate to the local directory and begin building your mo
       - In **graph.py:** ```lowres, highres = data.get_batch()```
 - [ ] Create a DataSampler object with the filepaths to your train/valid/test sets and the data shapes dictionary.
 - [ ] Define hyperparameters to optimize over and their corresponding domain ranges in dictionary
-- [ ] Pass your graph object and parameter dictionary to Sherpa via ```gilgalad.opt.bayesian_optimization```
+- [ ] Pass your graph object and hyperparameter dictionary to Sherpa via ```gilgalad.opt.bayesian_optimization```
 - [ ] (Optional) Add custom plotting functionality in plotting.py
 
 
