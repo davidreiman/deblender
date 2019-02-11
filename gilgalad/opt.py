@@ -27,8 +27,9 @@ def bayesian_optimization(graph, params, max_trials, iter_per_trial=10,
             {'batch_size': [16, 32, 64]},
     }
     """
-    assert all(isinstance(var, int)
-        for var in [max_trials, iter_per_trial, batches_per_iter])
+    assert isinstance(max_trials, int), "Max trials must be an integer."
+    assert isinstance(iter_per_trial, int), "Iters/trial must be an integer."
+    assert isinstance(batches_per_iter, int), "Batches/iter must be an integer."
 
     param_class = {
         'discrete': sherpa.Discrete,

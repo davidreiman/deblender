@@ -37,3 +37,12 @@ hyperparameters = {
     'Choice':
         {'activation': ['relu', 'prelu']}
 }
+
+best_model = gg.opt.bayesian_optimization(
+    graph=graph,
+    params=hyperparameters,
+    max_trials=50,
+    iter_per_trial=10,
+    batches_per_iter=1000,
+    dashboard=True
+)

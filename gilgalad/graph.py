@@ -105,6 +105,9 @@ class Graph(BaseGraph):
         gpu_options = tf.GPUOptions(allow_growth=True)
         self.config = tf.ConfigProto(gpu_options=gpu_options)
 
+        if hasattr(self, 'sess'):
+            self.sess.close()
+
         self.sess = tf.Session(config=self.config)
         self.sess.run(tf.global_variables_initializer())
 
