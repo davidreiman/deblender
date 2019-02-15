@@ -69,6 +69,14 @@ class Graph(BaseGraph):
 
     def build_graph(self, params=None):
 
+        if hasattr(self, 'sess'):
+            self.sess.close()
+
+        # This works except that our data sampler tensors are on the previous graph!
+        # To-do: either instantiate the sampler here or find a way to move data sampler
+        # tensors from the previous graph to this one, or retain them in the graph reset.
+        tf.reset_default_graph()
+
         self.x, self.y = self.data.get_batch()
 
         self.y_ = self.network(self.x, params=params)
@@ -104,9 +112,6 @@ class Graph(BaseGraph):
 
         gpu_options = tf.GPUOptions(allow_growth=True)
         self.config = tf.ConfigProto(gpu_options=gpu_options)
-
-        if hasattr(self, 'sess'):
-            self.sess.close()
 
         self.sess = tf.Session(config=self.config)
         self.sess.run(tf.global_variables_initializer())
