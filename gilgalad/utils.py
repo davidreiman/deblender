@@ -28,13 +28,18 @@ class DataSampler:
         assert isinstance(batch_size, int), "Batch size must be integer-valued."
         assert isinstance(buffer_size, int), "Buffer size must be integer-valued."
 
+        self.train_path = train_path
+        self.valid_path = valid_path
+        self.test_path = test_path
         self.data_shapes = data_shapes
         self.batch_size = batch_size
         self.shuffle = shuffle
         self.buffer_size = buffer_size
+        self.initialized = False
 
-        valid, test = map(self.make_dataset, [valid_path, test_path])
-        train = self.make_dataset(train_path, train=True)
+    def initialize(self):
+        valid, test = map(self.make_dataset, [self.valid_path, self.test_path])
+        train = self.make_dataset(self.train_path, train=True)
 
         self.iter = tf.data.Iterator.from_structure(
             train.output_types, train.output_shapes)
@@ -42,6 +47,7 @@ class DataSampler:
             self.iter.make_initializer, [train, valid, test])
         self.init_ops = dict(zip(['train', 'valid', 'test'],
             [train_init, valid_init, test_init]))
+        self.initialized = True
 
     def make_dataset(self, filepath, train=False):
         files = [os.path.join(filepath, file) for file
@@ -55,7 +61,9 @@ class DataSampler:
         else:
             return dataset.batch(self.batch_size)
 
-    def initialize(self, dataset='train'):
+    def get_dataset(self, dataset='train'):
+        if not self.initialized:
+            raise ValueError('Sampler must be initialized before dataset retrieval.')
         try:
             return self.init_ops.get(dataset)
         except:
@@ -69,6 +77,9 @@ class DataSampler:
         return parsed
 
     def get_batch(self):
+        if not self.initialized:
+            raise ValueError('Sampler must be initialized before batch retrieval.')
+
         batch = self.iter.get_next()
         batch = [tf.reshape(batch[i], [-1] + list(v))
             for i, v in enumerate(self.data_shapes.values())]

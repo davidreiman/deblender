@@ -77,6 +77,8 @@ class Graph(BaseGraph):
         # tensors from the previous graph to this one, or retain them in the graph reset.
         tf.reset_default_graph()
 
+        self.data.initialize()
+
         self.x, self.y = self.data.get_batch()
 
         self.y_ = self.network(self.x, params=params)
@@ -141,7 +143,7 @@ class Graph(BaseGraph):
 
     def train(self, n_batches, summary_interval=100, ckpt_interval=10000):
         self.network.training = True
-        self.sess.run(self.data.initialize('train'))
+        self.sess.run(self.data.get_dataset('train'))
 
         try:
             for batch in pbar(range(n_batches), unit='batch'):
@@ -160,7 +162,7 @@ class Graph(BaseGraph):
 
     def evaluate(self):
         self.network.training = False
-        self.sess.run(self.data.initialize('valid'))
+        self.sess.run(self.data.get_dataset('valid'))
 
         scores = []
         while True:
@@ -176,5 +178,5 @@ class Graph(BaseGraph):
 
     def infer(self):
         self.network.training = False
-        self.sess.run(self.data.initialize('test'))
+        self.sess.run(self.data.get_dataset('test'))
         pass
