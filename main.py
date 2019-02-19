@@ -26,25 +26,26 @@ graph = gg.graph.Graph(
     ckptdir=ckptdir
 )
 
-graph.train(n_batches=10)
-
+print(graph.train(n_batches=10))
 print(graph.evaluate())
 
-# hyperparameters = {
-#     'Discrete':
-#         {'filters': [64, 128],
-#          'kernel_size': [3, 5]},
-#     'Continuous':
-#         {'lr': [1e-5, 1e-3]},
-#     'Choice':
-#         {'activation': ['relu', 'prelu']}
-# }
-#
-# best_model = gg.opt.bayesian_optimization(
-#     graph=graph,
-#     params=hyperparameters,
-#     max_trials=50,
-#     iter_per_trial=10,
-#     batches_per_iter=10,
-#     dashboard=False
-# )
+hyperparameters = {
+    'Discrete':
+        {'filters': [64, 128],
+         'kernel_size': [3, 5]},
+    'Continuous':
+        {'lr': [1e-5, 1e-3]},
+    'Choice':
+        {'activation': ['relu', 'prelu']}
+}
+
+best_model = gg.opt.bayesian_optimization(
+    graph=graph,
+    params=hyperparameters,
+    max_trials=3,
+    iter_per_trial=1,
+    batches_per_iter=1,
+    dashboard=False
+)
+
+print(best_model)

@@ -1,6 +1,7 @@
 import os
 import sherpa
-import numpy as np
+from tqdm import tqdm as pbar
+
 
 def bayesian_optimization(graph, params, max_trials, iter_per_trial=10,
     batches_per_iter=1000, dashboard=False):
@@ -55,7 +56,7 @@ def bayesian_optimization(graph, params, max_trials, iter_per_trial=10,
         disable_dashboard=not dashboard,
     )
 
-    for trial in study:
+    for trial in pbar(study, unit='trial'):
         graph.build_graph(params=trial.parameters)
         for iteration in range(iter_per_trial):
             training_error = graph.train(n_batches=batches_per_iter)
@@ -64,7 +65,7 @@ def bayesian_optimization(graph, params, max_trials, iter_per_trial=10,
                 trial=trial,
                 iteration=iteration,
                 objective=validation_error,
-                context={'training_error': training_error}
+                context={'Training Error': training_error}
             )
         study.finalize(trial)
 

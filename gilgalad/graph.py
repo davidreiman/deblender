@@ -79,7 +79,7 @@ class Graph(BaseGraph):
         self.y_ = self.network(self.x, params=params)
 
         self.loss = tf.losses.mean_squared_error(self.y, self.y_)
-        self.eval_metric = tf.metrics.mean_absolute_error(self.y, self.y_)
+        self.eval_metric = tf.metrics.mean_squared_error(self.y, self.y_)
 
         self.global_step = tf.Variable(0, name='global_step', trainable=False)
 
@@ -112,6 +112,7 @@ class Graph(BaseGraph):
 
         self.sess = tf.Session(config=self.config)
         self.sess.run(tf.global_variables_initializer())
+        self.sess.run(tf.local_variables_initializer())
 
         if self.logdir:
             self.summary_writer = tf.summary.FileWriter(
@@ -155,6 +156,10 @@ class Graph(BaseGraph):
             self.save()
             print("Save complete. Training stopped.")
 
+        finally:
+            loss = self.sess.run(self.loss)
+            return loss
+
     def evaluate(self):
         self.network.training = False
         self.sess.run(self.data.get_dataset('valid'))
@@ -162,7 +167,7 @@ class Graph(BaseGraph):
         scores = []
         while True:
             try:
-                metric = self.sess.run(self.eval_metric)
+                _, metric = self.sess.run(self.eval_metric)
                 scores.append(metric)
             except tf.errors.OutOfRangeError:
                 break
