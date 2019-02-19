@@ -52,6 +52,7 @@ class Graph(BaseGraph):
     def build_graph(self, params=None):
     
         tf.reset_default_graph()
+        self.data.initialize()
 
         self.x, self.y, self.z = self.data.get_batch()
         
