@@ -2,6 +2,7 @@ import os
 import time
 import sherpa
 from tqdm import tqdm as pbar
+from progress.bar import Bar
 from .utils import to_stdout
 
 
@@ -49,7 +50,7 @@ def bayesian_optimization(graph, params, max_trials, iter_per_trial=10,
             assert isinstance(value, list), "Parameter range must be a list."
             parameters.append(param_class.get(k.lower())(key, value))
 
-    alg = sherpa.algorithms.BayesianOptimization(max_num_trials=max_trials)
+    alg = sherpa.algorithms.BayesianOptimization(max_num_trials=max_trials+1)
 
     study = sherpa.Study(
         parameters=parameters,
@@ -60,21 +61,38 @@ def bayesian_optimization(graph, params, max_trials, iter_per_trial=10,
 
     print("\nHyperparameter Optimization\n===========================\n")
 
-    for trial in pbar(study):
+    for i, trial in enumerate(study):
+
+        bar = Bar(
+            message='Trial {} of {}'.format(i+1, max_trials),
+            max=iter_per_trial,
+            fill = '◉'
+        )
+
         graph.build_graph(params=trial.parameters)
-        for iteration in pbar(range(iter_per_trial), leave=False):
-            training_error = graph.train(n_batches=batches_per_iter)
+
+        for iteration in range(iter_per_trial):
+
+            training_error = graph.train(
+                n_batches=batches_per_iter,
+                progress_bar=False
+            )
             validation_error = graph.evaluate()
+
             study.add_observation(
                 trial=trial,
                 iteration=iteration,
                 objective=validation_error,
                 context={'Training Error': training_error}
             )
+            bar.next()
+
         study.finalize(trial)
+        bar.finish()
+
     optimum = study.get_best_result()
 
     print("\nOptimal model\n-------------\n")
-
     to_stdout(optimum)
+
     return optimum

@@ -185,11 +185,14 @@ def to_stdout(obj):
     """
     if type(obj) == dict:
         for k, v in obj.items():
-            if hasattr(v, '__iter__'):
+            if not isinstance(v, str) and hasattr(v, '__iter__'):
                 print(k)
                 to_stdout(v)
             else:
-                print('%s: %s' % (k, v))
+                if isinstance(v, float):
+                    print('{}: {:.4e}'.format(k, v))
+                else:
+                    print('%s: %s' % (k, v))
     elif type(obj) == list:
         for v in obj:
             if hasattr(v, '__iter__'):

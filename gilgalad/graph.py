@@ -137,12 +137,19 @@ class Graph(BaseGraph):
                 global_step=global_step
             )
 
-    def train(self, n_batches, summary_interval=100, ckpt_interval=10000):
+    def train(self, n_batches, summary_interval=100, ckpt_interval=10000,
+        progress_bar=True):
+
         self.network.training = True
         self.sess.run(self.data.get_dataset('train'))
 
+        if progress_bar:
+            iter = pbar(range(n_batches), unit='batch')
+        else:
+            iter = range(n_batches)
+
         try:
-            for batch in pbar(range(n_batches), unit='batch'):
+            for batch in iter:
                 self.sess.run(self.update)
 
                 if batch % summary_interval == 0:
