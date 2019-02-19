@@ -79,7 +79,7 @@ class Graph(BaseGraph):
         self.y_ = self.network(self.x, params=params)
 
         self.loss = tf.losses.mean_squared_error(self.y, self.y_)
-        self.eval_metric = tf.metrics.mean_squared_error(self.y, self.y_)
+        self.eval_metric = tf.losses.mean_squared_error(self.y, self.y_)
 
         self.global_step = tf.Variable(0, name='global_step', trainable=False)
 
@@ -167,13 +167,12 @@ class Graph(BaseGraph):
         scores = []
         while True:
             try:
-                _, metric = self.sess.run(self.eval_metric)
+                metric = self.sess.run(self.eval_metric)
                 scores.append(metric)
             except tf.errors.OutOfRangeError:
                 break
 
         mean_score = np.mean(scores)
-
         return mean_score
 
     def infer(self):
