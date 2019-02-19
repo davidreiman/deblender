@@ -1,6 +1,8 @@
 import os
+import time
 import sherpa
 from tqdm import tqdm as pbar
+from .utils import to_stdout
 
 
 def bayesian_optimization(graph, params, max_trials, iter_per_trial=10,
@@ -73,6 +75,6 @@ def bayesian_optimization(graph, params, max_trials, iter_per_trial=10,
     optimum = study.get_best_result()
 
     print("\nOptimal model\n-------------\n")
-    to_stdout(optimum)
 
+    to_stdout(optimum)
     return optimum
