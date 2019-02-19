@@ -79,7 +79,6 @@ class DataSampler:
     def get_batch(self):
         if not self.initialized:
             raise ValueError('Sampler must be initialized before batch retrieval.')
-
         batch = self.iter.get_next()
         batch = [tf.reshape(batch[i], [-1] + list(v))
             for i, v in enumerate(self.data_shapes.values())]
