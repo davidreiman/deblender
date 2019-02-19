@@ -68,15 +68,10 @@ class Graph(BaseGraph):
         self.build_graph()
 
     def build_graph(self, params=None):
-
         if hasattr(self, 'sess'):
             self.sess.close()
 
-        # This works except that our data sampler tensors are on the previous graph!
-        # To-do: either instantiate the sampler here or find a way to move data sampler
-        # tensors from the previous graph to this one, or retain them in the graph reset.
         tf.reset_default_graph()
-
         self.data.initialize()
 
         self.x, self.y = self.data.get_batch()
@@ -167,7 +162,7 @@ class Graph(BaseGraph):
         scores = []
         while True:
             try:
-                metric = sess.run(self.eval_metric)
+                metric = self.sess.run(self.eval_metric)
                 scores.append(metric)
             except tf.errors.OutOfRangeError:
                 break

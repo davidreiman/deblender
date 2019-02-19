@@ -26,8 +26,10 @@ graph = gg.graph.Graph(
     ckptdir=ckptdir
 )
 
-# graph.train(n_batches=10)
-#
+graph.train(n_batches=10)
+
+print(graph.evaluate())
+
 # hyperparameters = {
 #     'Discrete':
 #         {'filters': [64, 128],
@@ -43,6 +45,6 @@ graph = gg.graph.Graph(
 #     params=hyperparameters,
 #     max_trials=50,
 #     iter_per_trial=10,
-#     batches_per_iter=1000,
-#     dashboard=True
+#     batches_per_iter=10,
+#     dashboard=False
 # )
