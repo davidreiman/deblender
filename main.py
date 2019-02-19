@@ -26,8 +26,8 @@ graph = gg.graph.Graph(
     ckptdir=ckptdir
 )
 
-print(graph.train(n_batches=10))
-print(graph.evaluate())
+graph.train(n_batches=10)
+graph.evaluate()
 
 hyperparameters = {
     'Discrete':
@@ -43,9 +43,7 @@ best_model = gg.opt.bayesian_optimization(
     graph=graph,
     params=hyperparameters,
     max_trials=3,
-    iter_per_trial=1,
+    iter_per_trial=3,
     batches_per_iter=1,
     dashboard=False
 )
-
-print(best_model)

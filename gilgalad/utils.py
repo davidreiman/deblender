@@ -177,3 +177,24 @@ def get_trainable_params():
     """
     model_vars = tf.trainable_variables()
     slim.model_analyzer.analyze_vars(model_vars, print_info=True)
+
+
+def to_stdout(obj):
+    """
+    Prints arbitrarily long dictionaries or lists to stdout.
+    """
+    if type(obj) == dict:
+        for k, v in obj.items():
+            if hasattr(v, '__iter__'):
+                print(k)
+                to_stdout(v)
+            else:
+                print('%s: %s' % (k, v))
+    elif type(obj) == list:
+        for v in obj:
+            if hasattr(v, '__iter__'):
+                to_stdout(v)
+            else:
+                print(v)
+    else:
+        print(obj)

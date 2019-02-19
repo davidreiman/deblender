@@ -56,9 +56,11 @@ def bayesian_optimization(graph, params, max_trials, iter_per_trial=10,
         disable_dashboard=not dashboard,
     )
 
-    for trial in pbar(study, unit='trial'):
+    print("\nHyperparameter Optimization\n===========================\n")
+
+    for trial in pbar(study):
         graph.build_graph(params=trial.parameters)
-        for iteration in range(iter_per_trial):
+        for iteration in pbar(range(iter_per_trial), leave=False):
             training_error = graph.train(n_batches=batches_per_iter)
             validation_error = graph.evaluate()
             study.add_observation(
@@ -68,7 +70,9 @@ def bayesian_optimization(graph, params, max_trials, iter_per_trial=10,
                 context={'Training Error': training_error}
             )
         study.finalize(trial)
-
     optimum = study.get_best_result()
+
+    print("\nOptimal model\n-------------\n")
+    to_stdout(optimum)
 
     return optimum
