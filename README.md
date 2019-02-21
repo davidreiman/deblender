@@ -77,7 +77,7 @@ class Graph(BaseGraph):
 ### Model-level
 
 ```python
-class CNN(Model):
+class Model(BaseModel):
   def __init__(self, name):
     self.name = name
   
