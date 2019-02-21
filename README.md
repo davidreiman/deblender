@@ -5,7 +5,7 @@
 ---
 
 <p align="center">
-A personal deep learning project template with frequently used utilities and layer combinations.
+A deep learning project template for TensorFlow. Includes utilities for TFDataset handling and hyperparameter optimization.
 </p>
 
 ## Getting Started
