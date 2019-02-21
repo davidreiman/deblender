@@ -26,7 +26,7 @@ gan = db.graph.Graph(
     generator=generator,
     discriminator=discriminator,
     vgg=vgg,
-    data_sampler=sampler,
+    sampler=sampler,
     logdir=logdir,
     ckptdir=ckptdir
 )
