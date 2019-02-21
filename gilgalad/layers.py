@@ -93,7 +93,7 @@ def res_block_2d(x, kernel_size, activation, training, batch_norm=True):
 def subpixel_conv(x, upscale_ratio, activation, kernel_size=3):
 
     assert len(x.shape) == 4, "Input tensor must be 4-dimensional."
-    assert isinstance(upscale_ratio, int), "Upscale ratio must be integer."
+    assert isinstance(upscale_ratio, int), "Upscale ratio must be integer-valued."
     activation = activation.lower()
 
     n_filters = int(x.shape[3])
