@@ -10,7 +10,7 @@ A deep learning project template for TensorFlow. Utilities for TFDataset handlin
 
 ## Getting Started
 
-Clone the repository, navigate to the local directory and begin building your models in the models.py module. Data should be divided into training, validation and testing sets and placed in .tfrecords file format in separate directories. Data shapes are specified by a dictionary which is subsequently passed to the data sampler during model creation. Note that the data shape dictionary keys must correspond to the same keys used in converting NumPy arrays to .tfrecords files during preprocessing. The data shape values should be tuples sans batch size.
+Fork the repository, navigate to the local directory and follow the quick start checklist below. Data should be divided into training, validation and testing sets and placed in .tfrecords file format in separate directories. Utilities for converting NumPy arrays to .tfrecords files are included in the utils.py module.
 
 ### Quick Start Checklist
 
