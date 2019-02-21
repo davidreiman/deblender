@@ -26,7 +26,7 @@ Fork the repository, navigate to the local directory and follow the quick start 
 - [ ] Create a DataSampler object with the filepaths to your train/valid/test sets and the data shapes dictionary.
 - [ ] Define hyperparameters to optimize over and their corresponding domain ranges in dictionary
 - [ ] Pass your graph object and hyperparameter dictionary to Sherpa via ```gilgalad.opt.bayesian_optimization```
-- [ ] (Optional) Add custom plotting functionality in plotting.py
+- [ ] (Optional) Add custom plotting functionality in plotting.py. Send any matplotlib figure to TensorBoard via tfplot.
 
 
 ## Model Selection
