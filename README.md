@@ -16,7 +16,7 @@ Fork the repository, navigate to the local directory and follow the quick start 
 
 - [ ] Build neural network models in models.py
     - **Note:** hyperparameters that will be optimized later need to be specified. See **Model Selection** section below.
-- [ ] Connect models, define loss, evaluation metrics, etc. in graph.py
+- [ ] Connect models, define loss, evaluation metrics, optimizer, etc. in graph.py
     - **Note:** hyperparameters that will be optimized later need to be specified. See **Model Selection** section below.
 - [ ] Specify input data shapes in data_shapes dictionary
     - **Note:** Data shapes should not include batch size—this information is passed to the sampler instead
@@ -31,7 +31,7 @@ Fork the repository, navigate to the local directory and follow the quick start 
 
 ## Model Selection
 
-Gil-Galad model selection is employed via Sherpa's Bayesian optimization suite which utilizes sklearn's Gaussian process module. Bayesian optimization specifies a distribution over functions via a kernel function and prior. Here, the mean function corresponds to a surrogate objective function whose predictor variables are the model hyperparameters. The prior distribution over functions is updated via Bayes' rule to account for trial runs wherein the independent variables specify the model and the dependent variable is the evaluation of said model on the validation dataset.
+Gil-Galad model selection is employed via Sherpa's Bayesian optimization suite which utilizes sklearn's Gaussian process module. Bayesian optimization specifies a distribution over functions via a kernel function and prior. Here, the mean function corresponds to a surrogate objective function whose predictor variables are the model hyperparameters. The prior distribution over functions is updated via Bayes' rule to account for trial runs wherein the independent variables specify the model and the dependent variable is the evaluation of such a model on the validation dataset.
 
 With Gil-Galad, we specify which hyperparameters we will optimize by passing a parameter dictionary to our graph class while also defining default hyperparameters during graph and model construction as follows:
 
