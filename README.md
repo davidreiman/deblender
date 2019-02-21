@@ -5,7 +5,7 @@
 ---
 
 <p align="center">
-A deep learning project template for TensorFlow. Includes utilities for TFDataset handling and hyperparameter optimization.
+A deep learning project template for TensorFlow. Utilities for TFDataset handling and hyperparameter optimization.
 </p>
 
 ## Getting Started
