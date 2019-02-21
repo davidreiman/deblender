@@ -2,7 +2,7 @@ import tensorflow as tf
 from .layers import *
 
 
-class Model:
+class BaseModel:
     """
     Abstract neural network model class.
     """
@@ -24,7 +24,7 @@ class Model:
         raise NotImplementedError("Abstract class methods should not be called.")
 
 
-class ResNet(Model):
+class ResNet(BaseModel):
     def __init__(self, num_blocks=3, name='resnet'):
         self.name = name
         self.num_blocks = num_blocks
