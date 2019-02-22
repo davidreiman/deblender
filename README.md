@@ -13,4 +13,4 @@
 
 <img src="/docs/figures/sample-1.png"><br>
 <img src="/docs/figures/sample-2.png"><br>
-<img src="/docs/figures/sample-3.png"><br>
+<img src="/docs/figures/sample-3.png">
