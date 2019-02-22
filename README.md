@@ -10,8 +10,6 @@
 <img src="/docs/figures/generator.png"><br>
 <img src="/docs/figures/discriminator.png">
 
----
-
 ## Samples
 
 <img src="/docs/figures/sample-1.png"><br>
