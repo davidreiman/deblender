@@ -179,8 +179,8 @@ class Graph(BaseGraph):
         current_lr = self.sess.run(self.lr)
         self.sess.run(self.lr.assign(current_lr/10))
 
-    def train(self, n_batches, n_burn_in_batches=2000, summary_interval=100,
-        ckpt_interval=10000, progress_bar=True):
+    def train(self, n_batches=200000, n_burn_in_batches=2000, 
+        summary_interval=100, ckpt_interval=10000, progress_bar=True):
 
         self.sess.run(self.data.get_dataset('train'))
         self.g.training = True; self.d.training = True
