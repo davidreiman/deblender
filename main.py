@@ -33,5 +33,5 @@ gan = db.graph.Graph(
 
 gan.train()
 
-gan.image_evaluate(savedir='data/predictions')
-psnr, ssim = gan.metric_evaluate()
+# gan.image_evaluate(savedir='data/predictions')
+# psnr, ssim = gan.metric_evaluate()

@@ -1,4 +1,5 @@
 import tensorflow as tf
+from functools import partial
 from .layers import *
 
 
@@ -97,7 +98,8 @@ class Generator(BaseModel):
                 x=x,
                 filters=64,
                 kernel_size=9,
-                activation='prelu'
+                strides=1,
+                activation='prelu',
             )
 
             x_ = tf.identity(x)
@@ -108,7 +110,7 @@ class Generator(BaseModel):
                     x=x,
                     kernel_size=3,
                     activation='prelu',
-                    training=self.training
+                    training=self.training,
                 )
 
             x = conv_2d(
@@ -116,7 +118,7 @@ class Generator(BaseModel):
                 filters=64,
                 kernel_size=3,
                 strides=1,
-                activation='linear'
+                activation='linear',
             )
 
             x = batch_norm(x, training=self.training)
@@ -185,47 +187,54 @@ class Generator(BaseModel):
 
 
 class VGG19:
-    def __init__(self):
-        model = k.applications.VGG19()
-        self.vgg19 = k.models.Model(
-            inputs=model.input,
-            outputs=model.layers[20].output)
+    def __init__(self, name='vgg'):
+        self.name = name
+
+    def initialize(self):
+        with tf.variable_scope(self.name) as vs:
+            model = k.applications.VGG19()
+            self.vgg19 = k.models.Model(
+                inputs=model.input,
+                outputs=model.layers[20].output
+            )
 
     def __call__(self, x):
-        x = tf.image.resize_images(
-            x,
-            size=[224, 224],
-            method=0,
-            align_corners=False)
+        with tf.variable_scope(self.name) as vs:
+            x = tf.image.resize_images(
+                x,
+                size=[224, 224],
+                method=0,
+                align_corners=False,
+            )
 
-        x = (x + 1)/2.
-        x = 255. * x
+            x = (x + 1)/2.
+            x = 255. * x
 
-        VGG_MEAN = [103.939, 116.779, 123.68]
+            VGG_MEAN = [103.939, 116.779, 123.68]
 
-        if tf.__version__ <= '0.11':
-            red, green, blue = tf.split(3, 3, x)
-        else:
-            red, green, blue = tf.split(x, 3, 3)
+            if tf.__version__ <= '0.11':
+                red, green, blue = tf.split(3, 3, x)
+            else:
+                red, green, blue = tf.split(x, 3, 3)
 
-        assert red.get_shape().as_list()[1:] == [224, 224, 1]
-        assert green.get_shape().as_list()[1:] == [224, 224, 1]
-        assert blue.get_shape().as_list()[1:] == [224, 224, 1]
+            assert red.get_shape().as_list()[1:] == [224, 224, 1]
+            assert green.get_shape().as_list()[1:] == [224, 224, 1]
+            assert blue.get_shape().as_list()[1:] == [224, 224, 1]
 
-        if tf.__version__ <= '0.11':
-            bgr = tf.concat(3, [
-                blue - VGG_MEAN[0],
-                green - VGG_MEAN[1],
-                red - VGG_MEAN[2],
-            ])
-        else:
-            bgr = tf.concat(
-                [
+            if tf.__version__ <= '0.11':
+                bgr = tf.concat(3, [
                     blue - VGG_MEAN[0],
                     green - VGG_MEAN[1],
                     red - VGG_MEAN[2],
-                ], axis=3)
+                ])
+            else:
+                bgr = tf.concat(
+                    [
+                        blue - VGG_MEAN[0],
+                        green - VGG_MEAN[1],
+                        red - VGG_MEAN[2],
+                    ], axis=3)
 
-        assert bgr.get_shape().as_list()[1:] == [224, 224, 3]
+            assert bgr.get_shape().as_list()[1:] == [224, 224, 3]
 
-        return self.vgg19(bgr)
+            return self.vgg19(bgr)
