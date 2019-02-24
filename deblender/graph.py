@@ -48,8 +48,8 @@ class BaseGraph:
 
 
 class Graph(BaseGraph):
-
-    def __init__(self, network, sampler, logdir=None, ckptdir=None):
+    def __init__(self, generator, discriminator, vgg, sampler,
+        logdir=None, ckptdir=None):
         """
         Builds graph and defines loss functions & optimizers.
 
@@ -59,8 +59,6 @@ class Graph(BaseGraph):
             logdir(str): filepath for TensorBoard logging.
             ckptdir(str): filepath for saving model.
         """
-    def __init__(self, generator, discriminator, vgg, sampler,
-        logdir=None, ckptdir=None):
 
         self.g = generator
         self.d = discriminator
@@ -76,7 +74,7 @@ class Graph(BaseGraph):
             self.sess.close()
 
         tf.reset_default_graph()
-        
+
         self.vgg.initialize()
         self.data.initialize()
 
