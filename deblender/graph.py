@@ -4,6 +4,7 @@ import tensorflow as tf
 from tqdm import tqdm as pbar
 
 from .utils import *
+from .plotting import make_plot
 
 
 class BaseGraph:
@@ -225,6 +226,7 @@ class Graph(BaseGraph):
         if not os.path.isdir(savedir):
             os.makedirs(savedir)
 
+        batch = 0
         while True:
             try:
                 blended, true_x, true_y, gan_x, gan_y = self.sess.run(
@@ -235,7 +237,8 @@ class Graph(BaseGraph):
                     lambda x: (x + 1)/2, [true_x, true_y, gan_x, gan_y]
                 )
 
-                make_plots(blended, true_x, true_y, gan_x, gan_y, savedir)
+                make_plots(blended, true_x, true_y, gan_x, gan_y, savedir, batch)
+                batch += 1
 
             except tf.errors.OutOfRangeError:
                 break
