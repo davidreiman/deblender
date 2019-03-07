@@ -1,4 +1,3 @@
-import tfplot
 import seaborn as sns
 import matplotlib.pyplot as plt
 from matplotlib.gridspec import Gridspec as gs
