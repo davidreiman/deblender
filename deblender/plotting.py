@@ -4,16 +4,6 @@ import matplotlib.pyplot as plt
 from matplotlib.gridspec import Gridspec as gs
 
 
-def plot_spectrum(spec):
-    """
-    Plots 1-D data and returns matplotlib figure for use with tfplot.
-    """
-    plt.style.use('seaborn')
-    fig, ax = tfplot.subplots(figsize=(4, 3))
-    im = ax.plot(np.arange(1210, 1280, 0.25), spec)
-    return fig
-
-
 def make_plot(blended, true_x, true_y, gan_x, gan_y, savedir, batch):
     """
     Plots paneled figure of preblended, blended and deblended galaxies.
