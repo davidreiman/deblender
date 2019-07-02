@@ -6,10 +6,13 @@ import warnings
 import tensorflow as tf
 
 from tqdm import tqdm
-from .utils import np_to_tfrecords
 from skimage.io import imread
 from skimage.util import img_as_float
 from skimage.transform import AffineTransform, rescale, warp, rotate
+
+from deblender.utils import np_to_tfrecords
+
+
 plt.rcParams['figure.figsize'] = [8, 8]
 warnings.filterwarnings('ignore')
 

@@ -13,8 +13,8 @@ class DataSampler:
 
     Args:
         train_path(str): training data filepath containing .tfrecords files.
-        train_path(str): validation data filepath containing .tfrecords files.
-        train_path(str): test data filepath containing .tfrecords files.
+        valid_path(str): validation data filepath containing .tfrecords files.
+        test_path(str): test data filepath containing .tfrecords files.
         data_shapes(dict): data shape dictionary to specify reshaping operation.
         batch_size(int): number of samples per batch call.
         shuffle(bool): shuffle data (only applicable to training set).
